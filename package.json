@@ -10,7 +10,5 @@
     "dev": "bun --hot server.js",
     "heroku": "bun --hot server-heroku.js"
   },
-  "dependencies": {
-    "netlify": "^17.0.0"
-  }
+  "dependencies": {}
 }
