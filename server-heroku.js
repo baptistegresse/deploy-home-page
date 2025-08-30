@@ -111,7 +111,35 @@ async function handleDeploy(req) {
     }
 
     const deploy = await createDeployResponse.json();
-    console.log("✅ Déploiement créé:", deploy.id);
+    console.log("✅ Déploiement créé:", deploy.id, "État:", deploy.state);
+
+    // Attendre que le déploiement soit dans l'état "uploading"
+    console.log("⏳ Attente que le déploiement soit prêt pour l'upload...");
+    let currentState = deploy.state;
+    let attempts = 0;
+
+    while (currentState !== "uploading" && attempts < 10) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      attempts++;
+
+      const deployStatusResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys/${deploy.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (deployStatusResponse.ok) {
+        const deployStatus = await deployStatusResponse.json();
+        currentState = deployStatus.state;
+        console.log(`📊 Tentative ${attempts}: État du déploiement: ${currentState}`);
+      }
+    }
+
+    if (currentState !== "uploading") {
+      throw new Error(`Déploiement pas prêt après ${attempts} tentatives. État final: ${currentState}`);
+    }
+
+    console.log("✅ Déploiement prêt pour l'upload (état: uploading)");
 
     // Maintenant uploader le fichier HTML dans ce déploiement
     console.log("📁 Upload du fichier HTML...");
