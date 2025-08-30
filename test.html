@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Auto Homepage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+
+    .feature {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .timestamp {
+      text-align: center;
+      font-size: 0.9em;
+      opacity: 0.8;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🚀 Test Auto Homepage</h1>
+
+    <div class="feature">
+      <h3>✅ Déploiement réussi !</h3>
+      <p>Cette page a été déployée automatiquement via l'API Auto Homepage.</p>
+    </div>
+
+    <div class="feature">
+      <h3>🔧 Fonctionnalités</h3>
+      <ul>
+        <li>Déploiement automatique sur Netlify</li>
+        <li>API REST simple</li>
+        <li>Optimisé pour Render</li>
+        <li>Gestion des erreurs robuste</li>
+      </ul>
+    </div>
+
+    <div class="feature">
+      <h3>📱 Responsive Design</h3>
+      <p>Cette page s'adapte automatiquement à tous les écrans et utilise des techniques modernes comme le
+        backdrop-filter pour un effet de verre.</p>
+    </div>
+
+    <div class="timestamp">
+      Déployé le : <span id="timestamp"></span>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('timestamp').textContent = new Date().toLocaleString('fr-FR');
+  </script>
+</body>
+
+</html>
