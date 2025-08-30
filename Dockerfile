@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copier les fichiers
 COPY package.json .
-COPY server.js .
+COPY server-heroku.js .
 
 # Installer les dépendances
 RUN bun install
@@ -13,4 +13,4 @@ RUN bun install
 EXPOSE 3000
 
 # Démarrer le serveur
-CMD ["bun", "server.js"]
+CMD ["bun", "server-heroku.js"]
