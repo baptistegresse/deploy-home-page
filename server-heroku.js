@@ -90,41 +90,51 @@ async function handleDeploy(req) {
       console.log("📊 État du site:", siteStatus.state);
     }
 
-    // Utiliser l'API d'upload de fichiers (méthode officielle recommandée)
-    console.log("📤 Déploiement via API upload...");
+    // Utiliser l'API de déploiement par upload de fichiers binaires (méthode officielle)
+    console.log("📤 Déploiement via API upload binaire...");
 
-    // Créer le contenu HTML avec la structure officielle
-    const deployContent = {
-      files: {
-        'index.html': {
-          content: htmlContent
-        }
-      },
-      message: "Deployment via API upload",
-      draft: false
-    };
-
-    // Utiliser l'endpoint officiel pour l'upload
-    const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
+    // Créer un déploiement vide d'abord
+    const createDeployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(deployContent)
+      body: JSON.stringify({
+        message: "Deployment via API"
+      })
     });
 
-    if (!deployResponse.ok) {
-      const errorText = await deployResponse.text();
-      throw new Error(`Erreur déploiement: ${deployResponse.status} - ${errorText}`);
+    if (!createDeployResponse.ok) {
+      const errorText = await createDeployResponse.text();
+      throw new Error(`Erreur création déploiement: ${createDeployResponse.status} - ${errorText}`);
     }
 
-    const deploy = await deployResponse.json();
-    console.log("✅ Déploiement réussi:", deploy);
+    const deploy = await createDeployResponse.json();
+    console.log("✅ Déploiement créé:", deploy.id);
+
+    // Maintenant uploader le fichier HTML dans ce déploiement
+    console.log("📁 Upload du fichier HTML...");
+
+    const uploadResponse = await fetch(`https://api.netlify.com/api/v1/deploys/${deploy.id}/files/index.html`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'text/html'
+      },
+      body: htmlContent
+    });
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      throw new Error(`Erreur upload fichier: ${uploadResponse.status} - ${errorText}`);
+    }
+
+    console.log("✅ Fichier HTML uploadé avec succès");
 
     // Attendre que le déploiement soit terminé
     console.log("⏳ Attente fin du déploiement...");
-    await new Promise(resolve => setTimeout(resolve, 20000));
+    await new Promise(resolve => setTimeout(resolve, 15000));
 
     // Vérifier l'état final du déploiement
     const finalDeployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys/${deploy.id}`, {
@@ -144,7 +154,7 @@ async function handleDeploy(req) {
 
     return new Response(JSON.stringify({
       success: true,
-      message: "Site déployé avec succès (méthode API upload officielle)",
+      message: "Site déployé avec succès (méthode upload binaire officielle)",
       deployUrl: deployUrl,
       siteName: site.name,
       siteId: site.id,
