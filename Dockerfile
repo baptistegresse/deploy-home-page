@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y zip && rm -rf /var/lib/apt/lists/*
 
 # Copier les fichiers
 COPY package.json .
-COPY server-heroku.js .
+COPY server.js .
 
 # Installer les dépendances
 RUN bun install
@@ -16,4 +16,4 @@ RUN bun install
 EXPOSE 3000
 
 # Démarrer le serveur
-CMD ["bun", "server-heroku.js"]
+CMD ["bun", "server.js"]
