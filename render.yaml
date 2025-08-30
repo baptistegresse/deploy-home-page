@@ -4,7 +4,7 @@ services:
     env: bun
     plan: free
     buildCommand: bun install
-    startCommand: bun server-heroku.js
+    startCommand: bun server.js
     envVars:
       - key: NETLIFY_TOKEN
         sync: false
