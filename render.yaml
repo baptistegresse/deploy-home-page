@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: auto-homepage-deploy
+    env: bun
+    plan: free
+    buildCommand: bun install
+    startCommand: bun server-heroku.js
+    envVars:
+      - key: NETLIFY_TOKEN
+        sync: false
+    healthCheckPath: /
+    autoDeploy: true

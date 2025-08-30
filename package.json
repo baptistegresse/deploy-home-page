@@ -1,0 +1,16 @@
+{
+  "name": "auto-homepage",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "deploy": "node deploy.js",
+    "start": "node deploy.js",
+    "server": "bun --hot server.js",
+    "server:heroku": "bun --hot server-heroku.js",
+    "dev": "bun --hot server.js",
+    "heroku": "bun --hot server-heroku.js"
+  },
+  "dependencies": {
+    "netlify": "^17.0.0"
+  }
+}
