@@ -2,6 +2,9 @@ FROM oven/bun:1
 
 WORKDIR /app
 
+# Installer zip
+RUN apt-get update && apt-get install -y zip && rm -rf /var/lib/apt/lists/*
+
 # Copier les fichiers
 COPY package.json .
 COPY server-heroku.js .

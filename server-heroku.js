@@ -1,6 +1,4 @@
 import { serve } from "bun";
-import fs from "fs";
-import path from "path";
 
 const server = serve({
   port: process.env.PORT || 3000,
@@ -92,122 +90,46 @@ async function handleDeploy(req) {
       console.log("📊 État du site:", siteStatus.state);
     }
 
-    // Créer un dossier temporaire avec le HTML
-    const tempDir = path.join(process.cwd(), `temp-${Date.now()}`);
-    fs.mkdirSync(tempDir);
-    fs.writeFileSync(path.join(tempDir, "index.html"), htmlContent, "utf-8");
+    // Déployer directement via l'API (méthode simplifiée)
+    console.log("📤 Déploiement via API...");
 
-    // Créer un fichier netlify.toml pour la configuration
-    const netlifyConfig = `
-[build]
-  publish = "."
-  command = ""
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-`;
-    fs.writeFileSync(path.join(tempDir, "netlify.toml"), netlifyConfig);
-
-    console.log("📁 Fichiers préparés dans:", tempDir);
-
-    // Utiliser l'API de déploiement par ZIP (plus fiable)
-    console.log("📤 Création du ZIP et déploiement...");
-
-    // Créer un ZIP des fichiers
-    const { execSync } = await import("child_process");
-
-    try {
-      // Créer un ZIP (si zip est disponible)
-      execSync(`cd ${tempDir} && zip -r ../deploy.zip .`, { stdio: 'pipe' });
-
-      // Lire le fichier ZIP
-      const zipContent = fs.readFileSync(path.join(process.cwd(), "deploy.zip"));
-
-      // Déployer le ZIP via l'API
-      const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/zip'
+    const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: {
+          'index.html': {
+            content: htmlContent
+          }
         },
-        body: zipContent
-      });
+        message: "Deployment via API"
+      })
+    });
 
-      if (!deployResponse.ok) {
-        const errorText = await deployResponse.text();
-        throw new Error(`Erreur déploiement ZIP: ${deployResponse.status} - ${errorText}`);
-      }
-
-      const deploy = await deployResponse.json();
-      console.log("✅ Déploiement ZIP réussi:", deploy);
-
-      // Nettoyer
-      fs.rmSync(tempDir, { recursive: true, force: true });
-      fs.unlinkSync(path.join(process.cwd(), "deploy.zip"));
-
-      const deployUrl = `https://${site.name}.netlify.app`;
-
-      return new Response(JSON.stringify({
-        success: true,
-        message: "Site déployé avec succès (via ZIP)",
-        deployUrl: deployUrl,
-        siteName: site.name,
-        siteId: site.id,
-        deployId: deploy.id,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { "Content-Type": "application/json" }
-      });
-
-    } catch (zipError) {
-      console.error("❌ Erreur ZIP:", zipError.message);
-
-      // Fallback: essayer l'API files (moins fiable)
-      console.log("🔄 Tentative via API files...");
-
-      const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          files: {
-            'index.html': {
-              content: htmlContent
-            }
-          },
-          message: "Deployment via API files"
-        })
-      });
-
-      if (!deployResponse.ok) {
-        const errorText = await deployResponse.text();
-        throw new Error(`Erreur déploiement files: ${deployResponse.status} - ${errorText}`);
-      }
-
-      const deploy = await deployResponse.json();
-      console.log("✅ Déploiement files réussi:", deploy);
-
-      // Nettoyer
-      fs.rmSync(tempDir, { recursive: true, force: true });
-
-      const deployUrl = `https://${site.name}.netlify.app`;
-
-      return new Response(JSON.stringify({
-        success: true,
-        message: "Site déployé avec succès (via API files)",
-        deployUrl: deployUrl,
-        siteName: site.name,
-        siteId: site.id,
-        deployId: deploy.id,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { "Content-Type": "application/json" }
-      });
+    if (!deployResponse.ok) {
+      const errorText = await deployResponse.text();
+      throw new Error(`Erreur déploiement: ${deployResponse.status} - ${errorText}`);
     }
+
+    const deploy = await deployResponse.json();
+    console.log("✅ Déploiement réussi:", deploy);
+
+    const deployUrl = `https://${site.name}.netlify.app`;
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: "Site déployé avec succès (via API)",
+      deployUrl: deployUrl,
+      siteName: site.name,
+      siteId: site.id,
+      deployId: deploy.id,
+      timestamp: new Date().toISOString()
+    }), {
+      headers: { "Content-Type": "application/json" }
+    });
 
   } catch (error) {
     console.error("❌ Erreur:", error.message);
