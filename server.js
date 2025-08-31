@@ -57,6 +57,12 @@ const server = serve({
       });
     }
 
+    if (url.pathname === "/test-env") {
+      console.log("🔍 Test environnement demandé");
+
+      return handleTestEnv();
+    }
+
     console.log("❌ Route non trouvée:", url.pathname);
     return new Response("Not found", { status: 404 });
   },
@@ -165,7 +171,18 @@ async function handleDeploy(req) {
     try {
       // Créer un fichier ZIP (plus fiable que l'API directe)
       console.log("🗜️ Création du fichier ZIP...");
-      const zipCommand = `cd ${tempDir} && zip -r ../deploy-${Date.now()}.zip .`;
+
+      // Vérifier si zip est disponible
+      try {
+        execSync('which zip', { encoding: 'utf-8', stdio: 'pipe' });
+        console.log("✅ Commande zip disponible");
+      } catch (zipCheckError) {
+        console.log("⚠️ Commande zip non disponible, passage au fallback");
+        throw new Error("Commande zip non disponible sur cette plateforme");
+      }
+
+      const zipTimestamp = Date.now();
+      const zipCommand = `cd ${tempDir} && zip -r ../deploy-${zipTimestamp}.zip .`;
       console.log("💻 Commande ZIP:", zipCommand);
 
       execSync(zipCommand, {
@@ -173,7 +190,7 @@ async function handleDeploy(req) {
         stdio: 'pipe'
       });
 
-      const zipPath = path.join(process.cwd(), `deploy-${Date.now()}.zip`);
+      const zipPath = path.join(process.cwd(), `deploy-${zipTimestamp}.zip`);
       console.log("✅ Fichier ZIP créé:", zipPath);
 
       // Vérifier que le fichier ZIP existe et a une taille > 0
@@ -243,7 +260,7 @@ async function handleDeploy(req) {
       console.error("❌ Stack trace:", zipError.stack);
 
       // Fallback: déployer directement via l'API avec le contenu HTML
-      console.log("🔄 Fallback: déploiement direct HTML...");
+      console.log("🔄 Fallback: déploiement direct HTML (méthode recommandée pour Render)...");
 
       const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
         method: 'POST',
@@ -303,6 +320,52 @@ async function handleDeploy(req) {
 
     return new Response(JSON.stringify({
       success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+}
+
+async function handleTestEnv() {
+  try {
+    const { execSync } = await import("child_process");
+    const envTest = {
+      timestamp: new Date().toISOString(),
+      cwd: process.cwd(),
+      commands: {}
+    };
+
+    // Tester les commandes système
+    const commands = ['zip', 'which', 'ls', 'pwd'];
+    for (const cmd of commands) {
+      try {
+        const result = execSync(`which ${cmd}`, { encoding: 'utf-8', stdio: 'pipe' });
+        envTest.commands[cmd] = { available: true, path: result.trim() };
+      } catch (error) {
+        envTest.commands[cmd] = { available: false, error: error.message };
+      }
+    }
+
+    // Tester les permissions
+    try {
+      const stats = fs.statSync(process.cwd());
+      envTest.permissions = {
+        mode: stats.mode.toString(8),
+        uid: stats.uid,
+        gid: stats.gid
+      };
+    } catch (error) {
+      envTest.permissions = { error: error.message };
+    }
+
+    return new Response(JSON.stringify(envTest, null, 2), {
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({
       error: error.message,
       timestamp: new Date().toISOString()
     }), {

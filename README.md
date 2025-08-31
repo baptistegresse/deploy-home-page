@@ -39,12 +39,31 @@ NETLIFY_TOKEN=your_netlify_personal_access_token_here
 
 ## 📡 Utilisation
 
+### Endpoints disponibles
+
+- **`/`** - Page d'accueil avec instructions
+- **`/health`** - Informations de santé du serveur
+- **`/test-env`** - Test de l'environnement système
+- **`/deploy`** - Déploiement de contenu HTML (POST)
+
 ### Déployer du HTML
 
 ```bash
 curl -X POST https://votre-app.onrender.com/deploy \
   -H "Content-Type: application/json" \
   -d '{"htmlContent": "<h1>Hello World!</h1>"}'
+```
+
+### Vérifier la santé du serveur
+
+```bash
+curl https://votre-app.onrender.com/health
+```
+
+### Tester l'environnement
+
+```bash
+curl https://votre-app.onrender.com/test-env
 ```
 
 ### Réponse
@@ -71,6 +90,37 @@ bun dev
 
 # Démarrer en mode production
 bun start
+```
+
+## 🧪 Tests
+
+### Test simple du serveur
+```bash
+bun run test-simple.js
+```
+
+### Test de l'environnement
+```bash
+bun run test-env.js
+```
+
+### Test de déploiement
+```bash
+bun run test-deploy.js
+```
+
+### Test avec curl
+```bash
+# Test de santé
+curl https://votre-app.onrender.com/health
+
+# Test environnement
+curl https://votre-app.onrender.com/test-env
+
+# Test déploiement
+curl -X POST https://votre-app.onrender.com/deploy \
+  -H "Content-Type: application/json" \
+  -d '{"htmlContent": "<h1>Test!</h1>"}'
 ```
 
 ## 🏗️ Architecture
