@@ -3,56 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Simple - Auto Homepage</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
-        .status {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #4CAF50;
-        }
-        .timestamp {
-            margin-top: 30px;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-    </style>
+    <title>Test Site Complet - Auto Homepage</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🎉 Test Réussi !</h1>
-        <p>Le déploiement automatique fonctionne parfaitement !</p>
+        <h1>🎉 Site Complet Déployé !</h1>
         
-        <div class="status">
-            <h3>✅ Statut : Déployé avec succès</h3>
-            <p>Cette page a été déployée automatiquement via l'API Auto Homepage</p>
+        <div class="feature">
+            <h3>✅ HTML Dynamique</h3>
+            <p>Cette page HTML vient de ta requête POST via n8n</p>
+        </div>
+        
+        <div class="feature">
+            <h3>🎨 CSS Stylisé</h3>
+            <p>Le fichier style.css du dossier site/ est automatiquement inclus</p>
+        </div>
+        
+        <div class="feature">
+            <h3>⚡ JavaScript Fonctionnel</h3>
+            <p>Le fichier index.js du dossier site/ est automatiquement inclus</p>
+        </div>
+        
+        <div class="feature">
+            <h3>🚀 Déploiement Automatique</h3>
+            <p>Tous les fichiers du dossier site/ sont déployés en une fois</p>
         </div>
         
         <div class="timestamp">
@@ -60,8 +35,6 @@
         </div>
     </div>
     
-    <script>
-        document.getElementById('timestamp').textContent = new Date().toLocaleString('fr-FR');
-    </script>
+    <script src="index.js"></script>
 </body>
 </html>

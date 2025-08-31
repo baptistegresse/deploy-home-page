@@ -92,11 +92,30 @@ bun dev
 bun start
 ```
 
+## 🏗️ Structure du projet
+
+```
+auto-homepage/
+├── server.js              # Serveur principal
+├── site/                  # Dossier des fichiers du site
+│   ├── index.js          # JavaScript (préservé lors du déploiement)
+│   ├── style.css         # CSS (préservé lors du déploiement)
+│   └── index.html        # HTML (écrasé par la requête POST)
+├── test-simple.html      # HTML de test pour le déploiement
+├── test-*.js             # Scripts de test
+└── README.md             # Documentation
+```
+
 ## 🧪 Tests
 
 ### Test simple du serveur
 ```bash
 bun run test-simple.js
+```
+
+### Test du site complet avec dossier site/
+```bash
+bun run test-site-complet.js
 ```
 
 ### Test de l'environnement
@@ -129,6 +148,8 @@ curl -X POST https://votre-app.onrender.com/deploy \
 - **Déploiement** : API Netlify (pas de CLI requise)
 - **Stockage** : Fichiers temporaires locaux (nettoyés après déploiement)
 - **Fallback** : Si la création de ZIP échoue, déploiement direct via API
+- **Dossier site/** : Tous les fichiers (JS, CSS, images) sont automatiquement inclus
+- **HTML dynamique** : L'index.html est remplacé par le contenu de la requête POST
 
 ## 📝 Notes importantes
 
@@ -136,6 +157,9 @@ curl -X POST https://votre-app.onrender.com/deploy \
 - Les sites sont nommés avec un timestamp pour éviter les conflits
 - Le code est optimisé pour fonctionner sur Render (pas de CLI Netlify)
 - Les fichiers temporaires sont automatiquement nettoyés
+- **Le dossier `site/` est automatiquement lu et déployé**
+- **L'`index.html` du dossier `site/` est remplacé par le contenu de la requête POST**
+- **Tous les autres fichiers (JS, CSS, images) sont préservés et déployés**
 
 ## 🐛 Dépannage
 

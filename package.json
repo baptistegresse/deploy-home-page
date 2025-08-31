@@ -5,7 +5,9 @@
   "scripts": {
     "start": "bun server.js",
     "dev": "bun --hot server.js",
-    "build": "echo 'No build step required'"
+    "build": "echo 'No build step required'",
+    "test": "bun run test-simple.js",
+    "test-site": "bun run test-site-complet.js"
   },
   "dependencies": {},
   "engines": {

@@ -68,9 +68,68 @@ const server = serve({
   },
 });
 
+// Fonction pour copier récursivement le contenu d'un dossier
+function copyDirectoryContents(sourceDir, targetDir, excludeFiles = []) {
+  console.log(`📋 Copie de ${sourceDir} vers ${targetDir}`);
+  
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  
+  const items = fs.readdirSync(sourceDir);
+  
+  for (const item of items) {
+    const sourcePath = path.join(sourceDir, item);
+    const targetPath = path.join(targetDir, item);
+    
+    // Vérifier si le fichier doit être exclu
+    if (excludeFiles.includes(item)) {
+      console.log(`⏭️ Fichier exclu: ${item}`);
+      continue;
+    }
+    
+    const stats = fs.statSync(sourcePath);
+    
+    if (stats.isDirectory()) {
+      console.log(`📁 Copie du dossier: ${item}`);
+      copyDirectoryContents(sourcePath, targetPath, excludeFiles);
+    } else {
+      console.log(`📄 Copie du fichier: ${item}`);
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
+}
+
+// Fonction pour ajouter récursivement les fichiers du dossier site au fallback
+function addSiteFilesToFallback(sourceDir, files, excludeFiles = [], currentPath = "") {
+  const items = fs.readdirSync(sourceDir);
+  
+  for (const item of items) {
+    // Vérifier si le fichier doit être exclu
+    if (excludeFiles.includes(item)) {
+      console.log(`⏭️ Fichier exclu du fallback: ${item}`);
+      continue;
+    }
+    
+    const sourcePath = path.join(sourceDir, item);
+    const filePath = currentPath ? `${currentPath}/${item}` : item;
+    
+    const stats = fs.statSync(sourcePath);
+    
+    if (stats.isDirectory()) {
+      console.log(`📁 Ajout du dossier au fallback: ${filePath}`);
+      addSiteFilesToFallback(sourcePath, files, excludeFiles, filePath);
+    } else {
+      console.log(`📄 Ajout du fichier au fallback: ${filePath}`);
+      const content = fs.readFileSync(sourcePath, 'utf-8');
+      files[filePath] = { content };
+    }
+  }
+}
+
 async function handleDeploy(req) {
   console.log("🔄 Début du traitement du déploiement...");
-
+  
   try {
     console.log("📖 Lecture du body de la requête...");
     const body = await req.json();
@@ -133,15 +192,28 @@ async function handleDeploy(req) {
     await new Promise(resolve => setTimeout(resolve, 3000));
     console.log("✅ Attente terminée");
 
-    // Créer un dossier temporaire avec le HTML
+        // Créer un dossier temporaire avec le HTML
     const tempDir = path.join(process.cwd(), `temp-${Date.now()}`);
     console.log("📁 Création du dossier temporaire:", tempDir);
     fs.mkdirSync(tempDir);
-
+    
+    // Écrire le HTML de la requête (écrase l'index.html du dossier site/)
     const htmlPath = path.join(tempDir, "index.html");
-    console.log("📝 Écriture du fichier HTML:", htmlPath);
+    console.log("📝 Écriture du fichier HTML (remplace celui du dossier site/):", htmlPath);
     fs.writeFileSync(htmlPath, htmlContent, "utf-8");
     console.log("✅ Fichier HTML écrit");
+
+    // Copier tous les fichiers du dossier site/ (sauf index.html qui est écrasé)
+    const siteDir = path.join(process.cwd(), "site");
+    console.log("📁 Lecture du dossier site:", siteDir);
+    
+    if (fs.existsSync(siteDir)) {
+      console.log("🔄 Copie des fichiers du dossier site...");
+      copyDirectoryContents(siteDir, tempDir, ["index.html"]); // Exclure index.html
+      console.log("✅ Fichiers du dossier site copiés");
+    } else {
+      console.log("⚠️ Dossier site non trouvé, déploiement HTML uniquement");
+    }
 
     // Créer un fichier netlify.toml pour la configuration
     const netlifyConfig = `
@@ -262,22 +334,32 @@ async function handleDeploy(req) {
       // Fallback: déployer directement via l'API avec le contenu HTML
       console.log("🔄 Fallback: déploiement direct HTML (méthode recommandée pour Render)...");
 
+      // Pour le fallback, on doit inclure tous les fichiers du dossier site/ dans la requête
+      console.log("📋 Préparation des fichiers pour le fallback...");
+      
+      const files = {
+        'index.html': {
+          content: htmlContent
+        },
+        'netlify.toml': {
+          content: netlifyConfig
+        }
+      };
+      
+      // Ajouter tous les fichiers du dossier site/ (sauf index.html)
+      if (fs.existsSync(siteDir)) {
+        console.log("🔄 Ajout des fichiers du dossier site au fallback...");
+        addSiteFilesToFallback(siteDir, files, ["index.html"]);
+        console.log("✅ Fichiers du dossier site ajoutés au fallback");
+      }
+      
       const deployResponse = await fetch(`https://api.netlify.com/api/v1/sites/${site.id}/deploys`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          files: {
-            'index.html': {
-              content: htmlContent
-            },
-            'netlify.toml': {
-              content: netlifyConfig
-            }
-          }
-        })
+        body: JSON.stringify({ files })
       });
 
       console.log("📡 Réponse déploiement fallback - Status:", deployResponse.status);
