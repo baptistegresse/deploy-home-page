@@ -97,11 +97,17 @@ bun start
 ```
 auto-homepage/
 ├── server.js              # Serveur principal
-├── site/                  # Dossier des fichiers du site
-│   ├── index.js          # JavaScript (préservé lors du déploiement)
-│   ├── style.css         # CSS (préservé lors du déploiement)
-│   └── index.html        # HTML (écrasé par la requête POST)
-├── test-simple.html      # HTML de test pour le déploiement
+├── site/                  # Dossier des fichiers du site Webflow
+│   ├── index.html        # Page principale Webflow (écrasée par la requête POST)
+│   ├── css/              # Styles Webflow (préservés)
+│   │   ├── webflow.css   # Styles principaux
+│   │   └── normalize.css # Reset CSS
+│   ├── js/               # JavaScript Webflow (préservé)
+│   │   └── webflow.js    # Fonctionnalités Webflow
+│   └── images/           # Assets Webflow (préservés)
+│       ├── favicon.ico   # Icône du site
+│       └── webclip.png   # Icône mobile
+├── test-webflow.html     # HTML de test pour le déploiement Webflow
 ├── test-*.js             # Scripts de test
 └── README.md             # Documentation
 ```
@@ -116,6 +122,11 @@ bun run test-simple.js
 ### Test du site complet avec dossier site/
 ```bash
 bun run test-site-complet.js
+```
+
+### Test du site Webflow complet
+```bash
+bun run test-webflow
 ```
 
 ### Test de l'environnement
@@ -150,6 +161,13 @@ curl -X POST https://votre-app.onrender.com/deploy \
 - **Fallback** : Si la création de ZIP échoue, déploiement direct via API
 - **Dossier site/** : Tous les fichiers (JS, CSS, images) sont automatiquement inclus
 - **HTML dynamique** : L'index.html est remplacé par le contenu de la requête POST
+
+## 🎨 **Intégration Webflow**
+
+- **Structure préservée** : CSS, JavaScript et assets Webflow restent intacts
+- **HTML personnalisable** : Contenu dynamique depuis n8n ou autres systèmes
+- **Déploiement automatique** : Site complet déployé en une fois
+- **Compatibilité** : Fonctionne avec tous les sites Webflow exportés
 
 ## 📝 Notes importantes
 

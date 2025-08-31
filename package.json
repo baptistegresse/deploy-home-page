@@ -7,7 +7,8 @@
     "dev": "bun --hot server.js",
     "build": "echo 'No build step required'",
     "test": "bun run test-simple.js",
-    "test-site": "bun run test-site-complet.js"
+    "test-site": "bun run test-site-complet.js",
+    "test-webflow": "bun run test-webflow-deploy.js"
   },
   "dependencies": {},
   "engines": {

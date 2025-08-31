@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Dynamique - Auto Homepage</title>
+  <!-- Les CSS Webflow seront automatiquement inclus depuis le dossier site/ -->
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 Site Dynamique Déployé !</h1>
+      <p>Ce contenu vient de n8n et remplace l'index.html Webflow</p>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h2>🎯 Fonctionnalités</h2>
+        <div class="features">
+          <div class="feature">
+            <h3>✅ HTML Dynamique</h3>
+            <p>Contenu personnalisé depuis n8n</p>
+          </div>
+          <div class="feature">
+            <h3>🎨 Styles Webflow</h3>
+            <p>CSS Webflow automatiquement inclus</p>
+          </div>
+          <div class="feature">
+            <h3>⚡ JavaScript Webflow</h3>
+            <p>Fonctionnalités Webflow préservées</p>
+          </div>
+          <div class="feature">
+            <h3>🖼️ Assets Webflow</h3>
+            <p>Images et favicon préservés</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="info">
+        <h2>📊 Informations de déploiement</h2>
+        <p>Déployé le : <span id="deploy-time"></span></p>
+        <p>Site créé automatiquement via l'API Auto Homepage</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>Powered by Auto Homepage + Webflow + n8n</p>
+    </footer>
+  </div>
+
+  <!-- Le JavaScript Webflow sera automatiquement inclus depuis le dossier site/ -->
+  <script>
+    // Code JavaScript personnalisé
+    document.addEventListener('DOMContentLoaded', function () {
+      const timeElement = document.getElementById('deploy-time');
+      if (timeElement) {
+        timeElement.textContent = new Date().toLocaleString('fr-FR');
+      }
+
+      console.log('🚀 Site dynamique chargé avec succès !');
+      console.log('✅ HTML personnalisé depuis n8n');
+      console.log('✅ CSS Webflow automatiquement inclus');
+      console.log('✅ JavaScript Webflow automatiquement inclus');
+    });
+  </script>
+</body>
+
+</html>
