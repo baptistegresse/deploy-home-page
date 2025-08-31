@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y zip && rm -rf /var/lib/apt/lists/*
 COPY package.json .
 COPY server.js .
 
+# Copier le dossier site/ avec tous ses fichiers
+COPY site/ ./site/
+
 # Installer les dépendances
 RUN bun install
 

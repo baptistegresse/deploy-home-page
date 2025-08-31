@@ -1,5 +1,30 @@
-node_modules
-site
-.git
-.env
+# Fichiers temporaires
+temp-*
+deploy-*.zip
+
+# Logs
 *.log
+
+# Dépendances
+node_modules/
+bun.lockb
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tests
+test-*.js
+test-*.html
+
+# Documentation
+README.md
+.gitignore
+
+# IMPORTANT: Ne PAS exclure le dossier site/ car il est nécessaire pour le déploiement
